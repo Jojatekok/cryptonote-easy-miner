@@ -17,7 +17,7 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Text="Your address:" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" IsReadOnly="True" VerticalContentAlignment="Center" FontFamily="Lucida Console" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="8 5 0 5"/>
+        <TextBox x:Name="TextBoxWalletAddress" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" IsReadOnly="True" VerticalContentAlignment="Center" FontFamily="Lucida Console" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="8 5 0 5"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Pool host:" VerticalAlignment="Center" HorizontalAlignment="Right"/>
         <TextBox Grid.Row="1" Grid.Column="1" Margin="8 5 13 5"/>
@@ -25,7 +25,7 @@
         <TextBox Grid.Row="1" Grid.Column="3" Margin="8 5 0 5"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="CPU cores:" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        <ComboBox Grid.Row="2" Grid.Column="1" Margin="8 5 13 5"/>
+        <ComboBox x:Name="ComboBoxCpuCores" Grid.Row="2" Grid.Column="1" Margin="8 5 13 5"/>
         <Button Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Content="Start mining" Margin="0 5"/>
 
         <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="False" VerticalScrollBarVisibility="Visible" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="0 5"/>
