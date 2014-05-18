@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace CryptoNoteMiner
+namespace CryptoNoteMinerGUI
 {
     public partial class App : Application
     {

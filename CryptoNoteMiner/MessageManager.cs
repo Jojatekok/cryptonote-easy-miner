@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace CryptoNoteMiner
+namespace CryptoNoteMinerGUI
 {
     static class MessageManager
     {
@@ -13,7 +13,5 @@ namespace CryptoNoteMiner
         {
             MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-
-
     }
 }

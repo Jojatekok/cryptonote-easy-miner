@@ -15,38 +15,23 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CryptoNoteMiner
+namespace CryptoNoteMinerGUI
 {
     public partial class MainWindow
     {
-        internal string BasePath { get; private set; }
-
-        internal const string RelativePathWalletData = "wallet";
-        internal const string RelativePathWalletAddress = "wallet.address.txt";
-
-        internal string RelativePathResources { get; private set; }
-        internal const string RelativePathResourceSimpleminer = "simpleminer.exe";
-        internal const string RelativePathResourceSimplewallet = "simplewallet.exe";
-
         internal string WalletAddress { get; private set; }
 
         public MainWindow()
         {
             InitializeComponent();
 
-            BasePath = AppDomain.CurrentDomain.BaseDirectory;
-            RelativePathResources = Environment.Is64BitOperatingSystem ?
-                                    @"Resources\64-bit\" :
-                                    @"Resources\32-bit\";
-
-
-            var currentFile = BasePath + RelativePathResources + RelativePathResourceSimpleminer;
+            var currentFile = Paths.ResourceSimpleminer;
             if (!File.Exists(currentFile)) MessageManager.ShowError("Missing file: " + currentFile);
 
-            currentFile = BasePath + RelativePathResources + RelativePathResourceSimplewallet;
+            currentFile = Paths.ResourceSimplewallet;
             if (!File.Exists(currentFile)) MessageManager.ShowError("Missing file: " + currentFile);
 
-            currentFile = BasePath + RelativePathResources + RelativePathWalletAddress;
+            currentFile = Paths.FileWalletAddress;
             if (File.Exists(currentFile)) {
                 ReadWalletAddress();
             } else {
@@ -59,48 +44,42 @@ namespace CryptoNoteMiner
                 ComboBoxCpuCores.Items.Add(i + 1);
             }
 
-            //var coresConfig = INI.Value("cores");
-            //int coresInt = comboBoxCores.Items.Count - 1;
-            //if (coresConfig != "")
-            //{
-            //    int coresParsed;
-            //    var parsed = int.TryParse(coresConfig, out coresParsed);
-            //    if (parsed) coresInt = coresParsed - 1;
-            //    if (coresInt + 1 > coresAvailable) coresInt = coresAvailable - 1;
+            var cpuCoresSelectionIndex = 0;
+            var cpuCoresConfig = ConfigManager.ReadString("CpuCores");
+            if (cpuCoresConfig != null) {
+                int cpuCoresParsed;
+                if (int.TryParse(cpuCoresConfig, out cpuCoresParsed)) {
+                    cpuCoresSelectionIndex = ComboBoxCpuCores.Items.IndexOf(cpuCoresParsed);
+                    if (cpuCoresSelectionIndex == -1) cpuCoresSelectionIndex = 0;
+                }
+            }
+            ComboBoxCpuCores.SelectedIndex = cpuCoresSelectionIndex;
 
-            //}
-            //comboBoxCores.SelectedIndex = coresInt;
+            var poolHost = ConfigManager.ReadString("PoolHost");
+            if (poolHost != null) TextBoxPoolHost.Text = poolHost;
 
-            //var poolHost = INI.Value("pool_host");
-            //if (poolHost != "")
-            //{
-            //    textBoxPoolHost.Text = poolHost;
-            //}
-            //var poolPort = INI.Value("pool_port");
-            //if (poolPort != "")
-            //{
-            //    textBoxPoolPort.Text = poolPort;
-            //}
+            var poolPort = ConfigManager.ReadString("PoolPort");
+            if (poolPort != null) TextBoxPoolPort.Text = poolPort;
 
             //Application.ApplicationExit += (s, e) => killMiners();
         }
 
         private void ReadWalletAddress()
         {
-            WalletAddress = File.ReadAllText(BasePath + RelativePathWalletAddress);
+            WalletAddress = File.ReadAllText(Paths.FileWalletAddress);
             TextBoxWalletAddress.Text = WalletAddress;
         }
 
         private void GenerateWallet()
         {
             var arguments = new[] {
-                "--generate-new-wallet=\"" + BasePath + RelativePathWalletData + "\"",
+                "--generate-new-wallet=\"" + Paths.FileWalletData + "\"",
                 "--password=x"
             };
 
             var process = new Process {
                 EnableRaisingEvents = true,
-                StartInfo = new ProcessStartInfo(BasePath + RelativePathResources + RelativePathResourceSimplewallet, string.Join(" ", arguments)) {
+                StartInfo = new ProcessStartInfo(Paths.ResourceSimplewallet, string.Join(" ", arguments)) {
                     CreateNoWindow = true,
                     UseShellExecute = false,
                     RedirectStandardOutput = true
@@ -108,12 +87,16 @@ namespace CryptoNoteMiner
             };
 
             process.Exited += (sender, e) => {
-                if (!File.Exists(BasePath + RelativePathWalletAddress)) {
+                if (!File.Exists(Paths.FileWalletAddress)) {
                     Dispatcher.Invoke(() => MessageManager.ShowError("Failed to generate new wallet."));
                 } else {
                     Dispatcher.Invoke(ReadWalletAddress);
                 }
             };
+
+            if (!Directory.Exists(Paths.DirectoryWalletData)) {
+                Directory.CreateDirectory(Paths.DirectoryWalletData);
+            }
 
             process.Start();
         }
